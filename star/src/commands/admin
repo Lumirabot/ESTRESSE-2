@@ -1,0 +1,21 @@
+import { MessageEmbed } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
+import { getUser } from '../../services/economyService';
+
+export const createEmbed = async (interaction: CommandInteraction) => {
+    const user = await getUser(interaction.user.id);
+    
+    if (!user) {
+        return interaction.reply('Usuário não encontrado.');
+    }
+
+    const embed = new MessageEmbed()
+        .setColor('#0099ff')
+        .setTitle('Informações do Usuário')
+        .addField('ID', user.id, true)
+        .addField('Saldo de Starcoins', user.balance.toString(), true)
+        .setTimestamp()
+        .setFooter('Sistema de Economia Star');
+
+    await interaction.reply({ embeds: [embed] });
+};

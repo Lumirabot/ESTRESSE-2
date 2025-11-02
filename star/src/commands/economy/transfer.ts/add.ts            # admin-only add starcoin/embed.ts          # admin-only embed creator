@@ -1,0 +1,44 @@
+// src/commands/economy/add.ts
+import { Message } from 'discord.js';
+import { getUser, updateUser } from '../../services/economyService';
+import { isAdmin } from '../../utils/helpers';
+
+export const addStarcoin = async (message: Message, args: string[]) => {
+    if (!isAdmin(message.author)) {
+        return message.reply("Você não tem permissão para usar este comando.");
+    }
+
+    const userId = args[0];
+    const amount = parseInt(args[1]);
+
+    if (!userId || isNaN(amount) || amount <= 0) {
+        return message.reply("Uso correto: !add <userId> <amount>");
+    }
+
+    const user = await getUser(userId);
+    if (!user) {
+        return message.reply("Usuário não encontrado.");
+    }
+
+    user.balance += amount;
+    await updateUser(user);
+
+    return message.channel.send(`Adicionado ${amount} starcoins para <@${userId}>.`);
+};
+
+// src/commands/admin/embed.ts
+import { MessageEmbed, Message } from 'discord.js';
+import { isAdmin } from '../../utils/helpers';
+
+export const createEmbed = (message: Message, title: string, description: string) => {
+    if (!isAdmin(message.author)) {
+        return message.reply("Você não tem permissão para usar este comando.");
+    }
+
+    const embed = new MessageEmbed()
+        .setTitle(title)
+        .setDescription(description)
+        .setColor('#FFD700');
+
+    return message.channel.send({ embeds: [embed] });
+};
